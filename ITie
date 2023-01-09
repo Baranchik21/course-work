@@ -1,0 +1,16 @@
+package rgsh;
+
+public interface ITie {
+	
+	public String getValue(int i, int j);
+	 
+	public void setValue(String num, int i);
+	
+	public int ksetup(int i);
+	
+	public int kak(int x);
+	
+	public int akak(int i, String str);
+	
+	public void searchthrough(String str, String st);
+}
