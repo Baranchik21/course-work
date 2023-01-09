@@ -1,0 +1,10 @@
+package rgsh;
+
+public class Developer {
+	ITie itie;
+	
+	public void setITie() {
+		this.itie = itie;
+		
+	}
+}
