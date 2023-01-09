@@ -1,0 +1,102 @@
+package rgsh;
+
+public class Events implements ITie {
+	int i, j, num;
+	int k = 1;
+	
+	String[][] array = new String[30][30];
+	{
+		array[0][0] = "wedding";
+		array[1][0] = "new year's celebration";
+		array[2][0] = "opening of the shopping center";
+	}
+	// { { "free", "wedding", "none" }, { "free", "new year's celebration", "none" },
+	// { "free", "opening of the shopping center", "none" } };
+
+	public String getValue(int i, int j) {
+		return array[i][j];
+	}
+	
+	public int ksetup(int i) {
+		for (int j = 0; j < 30; j++) {
+			if (array[i][j] == null) {
+				return j;
+			}
+		}
+		return 0;
+	}
+
+	public void setValue(String num, int i) {
+		int x = ksetup(i);
+		array[i][x] = num;
+	}
+	
+	public int kak(int x) {
+		for (int i = 0; i < array.length; i++) {
+			if ((x == i)&&(array[i][0] != null)) {
+				return 1;
+			}
+		}
+		return 0;
+	}
+	
+	public int akak(int i, String str) {				// String.valueOf()		i = trichoice, str = data sobitiya
+		for (int j = 1; j < 30; j++) {
+			if (array[i][j] == null) continue;		
+			if (array[i][j].equals(str)) {
+				return 0;
+			}
+		}
+		return 1;
+	}
+	
+	public String checker(String num, int l, int glen) {
+		int nums[] = new int[30];  
+		int count = 0;
+		for (int i = 0; i < array.length; i++) {
+			if (array[i][0] == null) continue;
+			for (int j = 1; j < 30; j++) {
+				if (array[i][j] == null) continue;		
+				if (array[i][j].equals(num)) {
+					nums[count] = i;
+					count += 1;
+					if (count == 2) {
+						if (l == 1) {
+							return "1";
+						}
+						if (l == 2) {
+							System.out.println(array[nums[0]][0]);
+							System.out.println(array[nums[1]][0]);
+							l = 3;
+						}
+					}
+					if (count > 2) {
+						if (l == 3) {
+							System.out.println(array[nums[count - 1]][0]);	
+						}
+					}
+					if ((l == 4)&&(count == glen)) {
+						return array[nums[glen - 1]][0];
+					}
+				}
+				continue;
+			}
+		}
+
+		return "0";
+	}
+
+	public void searchthrough(String str, String st) {
+		for (int i = 0; i < array.length; i++) {
+			if (array[i][0] == null) continue;
+			if (array[i][0].equals(str)) {
+				for (int j = 1; j < 30; j++) {
+					if (array[i][j] == null) continue;		
+					if (array[i][j].equals(st)) {
+						array[i][j] = null;
+					}
+				}
+			}
+		}
+	}
+}
