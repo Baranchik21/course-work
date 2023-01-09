@@ -1,0 +1,233 @@
+package rgsh;
+
+import java.util.Scanner;
+
+public class NewMain {
+
+	public static void main(String[] args) { 
+		int choice = 1;
+		int a;
+		int secchoice, trichoice, viborg;
+		int datei = 0;
+		String struse;
+		
+		Events events = new Events();
+		Date date = new Date();
+		Resources resources = new Resources();
+		Staff staff = new Staff();
+		
+		try (Scanner in = new Scanner(System.in)) {
+			while (choice != 0) {
+				System.out.println("type '1' to book an event, '2' to cancel what you booked earlier, '3' to check schedule, '4' to see all data");
+				choice =  in.nextInt();	
+				switch (choice) {
+				case 1:
+					datei = date.ksetup();	
+					System.out.println("type on what date you want to set event on");
+					secchoice = in.nextInt();
+					System.out.println("select event");
+					for (int i = 0; i < 3; i++) {
+						System.out.print((i + 1) + " - " + events.getValue(i, 0));
+						System.out.println();
+					}
+					trichoice = in.nextInt() - 1;
+					int kak = events.kak(trichoice);
+					if (kak == 0) {
+						System.err.println("wrong number");
+						break;
+					}
+					int akak = events.akak(trichoice, String.valueOf(secchoice));
+					if (akak == 0) {
+						System.err.println("this thing actually doesn't exist or already booked");
+						break;
+					}
+					if (resources.checker(String.valueOf(secchoice)) == 100) {
+						System.err.println("all places are unavailable");
+						break;
+					}
+					if (staff.checker(String.valueOf(secchoice)) == 100) {
+						System.err.println("all staff members are busy");
+						break;
+					}
+					date.setValue(String.valueOf(secchoice), datei, 0, 0);
+					events.setValue(String.valueOf(secchoice), trichoice);
+					System.out.println("you successfully booked " + events.getValue(trichoice, 0));
+					System.out.println();
+					date.setValue(events.getValue(trichoice, 0), datei, 1, 0);
+					// we done with events
+					
+					//System.out.println("now it's a time to pick places");
+					System.out.println("select place to hold an event");
+					for (int i = 0; i < 6; i++) {
+						for (int j = 0; j < 2; j++) {
+							if (j == 0) System.out.print((i + 1) + " - ");
+							System.out.print(resources.getValue(i, j) + " | ");
+						}
+						System.out.println();
+					}
+					a = 0;
+					while ((trichoice + 1) != 0) {
+						trichoice = in.nextInt() - 1;  
+						kak = resources.kak(trichoice);
+						if (trichoice == -1) break;
+						if (kak == 0) {
+							System.err.println("wrong number");
+							continue;
+						}
+						akak = resources.akak(trichoice, String.valueOf(secchoice));
+						if (akak == 0) {
+							System.err.println("this thing actually doesn't exist or already booked");
+							continue;
+						}
+						resources.setValue(String.valueOf(secchoice), trichoice);
+						System.out.println("you successfully booked " + resources.getValue(trichoice, 0));
+						System.out.println("anything else? you need to type '0' if you want to quit the circle");
+						date.setValue(resources.getValue(trichoice, 0), datei, 2, a);
+						a ++;
+					}
+					a = 0;
+					
+					// we done with resources
+					
+					System.out.println("select staff to lead event");
+					for (int i = 0; i < 6; i++) {
+						System.out.print((i + 1) + " - " + staff.getValue(i, 0));
+						System.out.println();
+					}
+					a = 0;
+					trichoice = 0;
+					while ((trichoice + 1) != 0) {
+						trichoice = in.nextInt() - 1;  
+						kak = staff.kak(trichoice);
+						if (trichoice == -1) break;
+						if (kak == 0) {
+							System.err.println("wrong number");
+							continue;
+						}
+						akak = staff.akak(trichoice, String.valueOf(secchoice));
+						if (akak == 0) {
+							System.err.println("this thing actually doesn't exist or already booked");
+							continue;
+						}
+						staff.setValue(String.valueOf(secchoice), trichoice);
+						System.out.println("you successfully booked " + staff.getValue(trichoice, 0));
+						System.out.println("anything else? you need to type '0' if you want to quit the circle");
+						date.setValue(staff.getValue(trichoice, 0), datei, 3, a);
+						a ++;
+					}
+					a = 0;
+					break;
+				case 2:
+					System.out.println("Type date you want to set to 'free'");
+					in.nextLine();
+					struse = in.nextLine();
+					int uxo = 0;
+					for (int i = 0; i < date.array.length; i++) {
+						if (date.array[i][0][0] == null) continue;
+						else if (date.array[i][0][0].equals(struse)) {
+							if ((events.checker(struse, 1, 0) == "1")&&(uxo == 0)) {
+								System.out.println("Choose which booking you want to cancel");
+								events.checker(struse, 2, 0);
+								uxo += 1;																			//events.checker(struse, 4, viborg)
+								viborg = in.nextInt();
+								String sheesh = events.checker(struse, 4, viborg);
+								System.out.println(sheesh);
+								int isit = date.isit(sheesh, struse);
+								for (int b = 0; b < 7; b++) {
+									events.searchthrough(date.array[isit][1][0], struse);
+									resources.searchthrough(date.array[isit][2][b], struse);
+									staff.searchthrough(date.array[isit][3][b], struse);
+									for (int j = 0; j < 4; j++) {
+										date.array[isit][j][b] = null;
+									}
+								}
+								break;
+							}
+							else {
+								for (int b = 0; b < 7; b++) {
+									events.searchthrough(date.array[i][1][0], struse);
+									resources.searchthrough(date.array[i][2][b], struse);
+									staff.searchthrough(date.array[i][3][b], struse);
+									for (int j = 0; j < 4; j++) {
+										date.array[i][j][b] = null;
+									}
+								}
+							}
+						}
+						continue;
+					}
+					break;
+				case 3:
+					for (int i = 0; i < date.array.length; i++) {
+						if (date.array[i][0][0] == null) {
+							continue;
+						}
+						for (int j = 0; j < 4; j++) {
+							if (date.array[i][j][1] == null) {
+								System.out.print(date.getValue(i, j, 0) + " | ");
+							}
+							else {
+								for (int b = 0; b < 7; b++) {
+									if (date.array[i][j][b] == null) {
+										continue;
+									}
+									System.out.print(date.getValue(i, j, b) + " | ");
+								}
+							}
+						}
+						System.out.println();
+					}
+					break;
+				case 4:
+					System.out.println("events:");
+					for (int i = 0; i < 6; i++) {
+						if (events.array[i][0] == null) {
+							continue;
+						}
+						for (int j = 0; j < 30; j++) {
+							if (events.array[i][j] == null) {
+								continue;
+							}
+							System.out.print(events.getValue(i, j) + " | ");
+						}
+						System.out.println();
+					}
+					System.out.println("palas'i:");
+					for (int i = 0; i < 6; i++) {
+						if (resources.array[i][0] == null) {
+							continue;
+						}
+						for (int j = 0; j < 30; j++) {
+							if (resources.array[i][j] == null) {
+								continue;
+							}
+							System.out.print(resources.getValue(i, j) + " | ");
+						}
+						System.out.println();
+					}
+					System.out.println("staff:");
+					for (int i = 0; i < 6; i++) {
+						if (staff.array[i][0] == null) {
+							continue;
+						}
+						for (int j = 0; j < 30; j++) {
+							if (staff.array[i][j] == null) {
+								continue;
+							}
+							System.out.print(staff.getValue(i, j) + " | ");
+						}
+						System.out.println();
+					}
+					break;
+				case 0:
+					System.err.println("wanna quit? ok whatever");
+					System.exit(0);
+				}
+				
+				if (choice < 0 || choice > 4) {
+					System.err.println("wrong number");
+				}
+			}
+		}
+	}
+}
